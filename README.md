@@ -1,5 +1,6 @@
 markdown
-#Stable Diffusion 이미지 변환 코드 문서
+**굵은 글씨**
+Stable Diffusion 이미지 변환 코드 문서
 ##개요
 이 코드는 Stable Diffusion Img2Img 모델을 사용하여 기존의 평면도 이미지를 변환하는 스크립트입니다.
 ##환경 설정
