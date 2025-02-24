@@ -1,106 +1,127 @@
 <!DOCTYPE html>
-
 <html lang="ko" data-content_root="./">
-  <head>
+<head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Stable Diffusion 이미지 변환 코드 문서 documentation &#8212; Stable Diffusion 이미지 변환 코드 문서 1.0 문서</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
-    <script src="_static/documentation_options.js?v=25ffd669"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/translations.js?v=afa94a99"></script>
-    <link rel="index" title="색인" href="genindex.html" />
-    <link rel="search" title="검색" href="search.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-
-  
-  
-
-  </head><body>
-  
-
+    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+</head>
+<body>
     <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
+        <div class="documentwrapper">
+            <div class="bodywrapper">
+                <div class="body" role="main">
+                    <section id="stable-diffusion-documentation">
+                        <h1>Stable Diffusion 이미지 변환 코드 문서</h1>
+                        <p>이 문서는 Stable Diffusion을 사용하여 평면도 이미지를 변환하는 방법에 대해 설명합니다. 벽체와 문의 형태를 유지하면서, 가구가 없는 공간을 강조하여 넓은 분위기를 연출합니다.</p>
 
-          <div class="body" role="main">
-            
-  <section id="stable-diffusion-documentation">
-<h1>Stable Diffusion 이미지 변환 코드 문서 documentation<a class="headerlink" href="#stable-diffusion-documentation" title="Link to this heading">¶</a></h1>
-<p>Add your content using <code class="docutils literal notranslate"><span class="pre">reStructuredText</span></code> syntax. See the
-<a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html">reStructuredText</a>
-documentation for details.</p>
-<div class="toctree-wrapper compound">
-</div>
-</section>
+                        <h2>환경 설정</h2>
+                        <p>이 코드를 실행하기 위해서는 다음과 같은 라이브러리가 필요합니다.</p>
+                        <h3>필수 라이브러리 설치</h3>
+                        <pre><code>pip install torch diffusers pillow</code></pre>
 
+                        <h2>코드 설명</h2>
+                        <h3>1. 라이브러리 임포트</h3>
+                        <pre><code>from diffusers import StableDiffusionImg2ImgPipeline, DDIMScheduler
+from PIL import Image
+import random
+import torch</code></pre>
+                        <p>필요한 라이브러리를 임포트합니다.</p>
+                        <ul>
+                            <li><strong>diffusers</strong>: Stable Diffusion 모델을 로드 및 실행하는 라이브러리</li>
+                            <li><strong>PIL (Pillow)</strong>: 이미지 파일을 불러오고 변환하는 라이브러리</li>
+                            <li><strong>random</strong>: 시드를 설정하여 재현성을 확보하기 위한 모듈</li>
+                            <li><strong>torch</strong>: PyTorch를 사용하여 모델을 실행하는 라이브러리</li>
+                        </ul>
 
-          </div>
-          
+                        <h3>2. Stable Diffusion 모델 로드</h3>
+                        <pre><code>model_id = "CompVis/stable-diffusion-v1-4"
+pipe = StableDiffusionImg2ImgPipeline.from_pretrained(
+    model_id,
+    torch_dtype=torch.float32
+)</code></pre>
+                        <p>CompVis/stable-diffusion-v1-4 모델을 불러옵니다. <code>torch_dtype=torch.float32</code>로 설정하여 모델이 32비트 부동소수점으로 연산하도록 설정합니다.</p>
+
+                        <h3>3. GPU 설정</h3>
+                        <pre><code>device = "cuda" if torch.cuda.is_available() else "cpu"
+pipe.to(device)</code></pre>
+                        <p>GPU가 사용 가능하면 <code>cuda</code>, 그렇지 않으면 <code>cpu</code>를 사용합니다.</p>
+
+                        <h3>4. 입력 이미지 불러오기 및 크기 조정</h3>
+                        <pre><code>input_image = Image.open(r"C:\Users\bin\Desktop\파일\checkpoints\pix2pix_experiment\web\images\epoch012_fake_B.png").convert("RGB")
+input_image = input_image.resize((512, 512))</code></pre>
+                        <p>지정된 경로에서 평면도 이미지를 불러옵니다. <code>convert("RGB")</code>를 사용하여 색상을 RGB 모드로 변환하며, 모델의 기본 입력 크기(512x512)에 맞추기 위해 리사이징합니다.</p>
+
+                        <h3>5. 텍스트 프롬프트 설정</h3>
+                        <pre><code>prompt = "Please retain the current shapes and colors of the walls and doors, while allowing for their flexible repositioning to enhance the layout. Ensure that no furniture is present in the image, as I want to emphasize the spaciousness and simplicity of the room, creating a calm and open atmosphere."</code></pre>
+                        <p>벽체와 문의 위치를 자유롭게 변경할 수 있도록 하며, 가구가 없는 공간을 유지하도록 설정합니다.</p>
+
+                        <h3>6. 이미지 생성 파라미터 설정</h3>
+                        <pre><code>num_inference_steps = 999
+guidance_scale = 500
+seed = random.randint(0, 2**32 - 1)
+generator = torch.manual_seed(seed)</code></pre>
+                        <p><code>num_inference_steps = 999</code>: 모델이 더욱 정밀하게 결과를 생성하도록 스텝 수를 설정합니다. <code>guidance_scale = 500</code>: 프롬프트를 강하게 반영하도록 설정합니다. <code>seed</code>: 랜덤 시드를 설정하여 재현성을 확보합니다.</p>
+
+                        <h3>7. 스케줄러 설정</h3>
+                        <pre><code>pipe.scheduler = DDIMScheduler.from_config(pipe.scheduler.config)</code></pre>
+                        <p>DDIM 스케줄러를 설정하여 모델이 이미지 변환을 수행하는 방식을 결정합니다.</p>
+
+                        <h3>8. 이미지 생성 실행</h3>
+                        <pre><code>num_images = 1
+images = pipe(
+    prompt=prompt,
+    image=input_image,
+    strength=0.7,
+    guidance_scale=300,
+    num_images_per_prompt=num_images,
+    num_inference_steps=num_inference_steps,
+    generator=generator
+).images</code></pre>
+                        <p><code>strength=0.7</code>: 원본 이미지의 영향을 70% 반영하도록 설정합니다. <code>guidance_scale=300</code>: 프롬프트를 매우 강하게 반영하도록 설정합니다. <code>num_images_per_prompt=num_images</code>: 한 번의 실행에서 생성할 이미지 개수를 설정합니다.</p>
+
+                        <h3>9. 생성된 이미지 저장</h3>
+                        <pre><code>for i, image in enumerate(images):
+    image.save(f"c_floorplan{i}.png")
+print(f"{num_images}개의 이미지가 생성되었습니다.")</code></pre>
+                        <p>생성된 이미지를 <code>c_floorplan{i}.png</code> 형식으로 저장하며, 이미지가 성공적으로 생성되었음을 알리는 메시지를 출력합니다.</p>
+
+                        <h2>실행 방법</h2>
+                        <p>이 코드를 실행하려면 Python 환경에서 다음 명령을 실행합니다:</p>
+                        <pre><code>python script.py</code></pre>
+                        <p>또는 Jupyter Notebook에서 실행할 수도 있습니다.</p>
+
+                        <h2>주의 사항</h2>
+                        <p>입력 이미지의 경로를 본인의 환경에 맞게 변경해야 합니다. GPU 사용을 권장하며, CPU에서 실행할 경우 속도가 느려질 수 있습니다.</p>
+
+                        <h2>참고 자료</h2>
+                        <ul>
+                            <li><a href="https://huggingface.co/docs/diffusers/index">Stable Diffusion 공식 문서</a></li>
+                            <li><a href="https://github.com/huggingface/diffusers">Diffusers 라이브러리 GitHub</a></li>
+                        </ul>
+                    </section>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="#">Stable Diffusion 이미지 변환 코드 문서</a></h1>
-
-
-
-
-
-
-
-
-
-<search id="searchbox" style="display: none" role="search">
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
-      <input type="submit" value="이동" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script><h3>탐색</h3>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="#">Documentation overview</a><ul>
-  </ul></li>
-</ul>
-</div>
-
-
-
-
-
-
-
-
+        <div class="sphinxsidebar" role="navigation" aria-label="Main">
+            <div class="sphinxsidebarwrapper">
+                <h1 class="logo"><a href="#">Stable Diffusion 이미지 변환 코드 문서</a></h1>
+                <h3>탐색</h3>
+                <div class="relations">
+                    <h3>Related Topics</h3>
+                    <ul>
+                        <li><a href="#">Documentation overview</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="clearer"></div>
+        <div class="clearer"></div>
     </div>
     <div class="footer">
-      &#169;2025, 여환빈.
-      
-      |
-      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.1</a>
-      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
-      
-      |
-      <a href="_sources/index.rst.txt"
-          rel="nofollow">Page source</a>
+        &#169;2025, 여환빈. | Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.1</a> &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a> | <a href="_sources/index.rst.txt" rel="nofollow">Page source</a>
     </div>
-
-    
-
-    
-  </body>
+</body>
 </html>
